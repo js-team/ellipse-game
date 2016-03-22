@@ -39,7 +39,7 @@ function Ellipse(options) {
 		let center = [(r1 + opt.lineWidth / 2), (r2 + opt.lineWidth / 2)];
 
 		let group = d3.select(svgDom).append('g')
-			.attr('transform', 'translate(' + center[0] + ',' + center[1] + ')');
+			.attr('transform', `translate(${center[0]},${center[1]})`);
 
 		let ellipse = group.append('ellipse')
 			.attr('rx', r1)
@@ -47,7 +47,7 @@ function Ellipse(options) {
 			.attr('stroke', opt.color)
 			.attr('stroke-width', opt.lineWidth)
 			.attr('fill', 'transparent')
-			.attr('clip-path', opt.clipId ? 'url(#' + opt.clipId + ')' : '');
+			.attr('clip-path', opt.clipId ? `url(#${opt.clipId})` : '');
 
 		return {
 			r1,
@@ -92,7 +92,7 @@ function Sector(options) {
 
 	let opt = Object.assign(defaults, options);
 
-	const startDeg = 270;
+	const START_DEG = 270;
 	let figureData = opt.figureData;
 	let maxVector = figureData[0].v;
 	let started = false;
@@ -104,8 +104,8 @@ function Sector(options) {
 			.attr('id', clipPathId);
 
 	let sector = clipPath.append('circle')
-			.attr('cx', getFigureCoords(startDeg).x)
-			.attr('cy', getFigureCoords(startDeg).y)
+			.attr('cx', getFigureCoords(START_DEG).x)
+			.attr('cy', getFigureCoords(START_DEG).y)
 			.attr('r', opt.sectorWidth);
 
 	// move sector handler
@@ -114,7 +114,7 @@ function Sector(options) {
 		let lRange = (t - (opt.sectorWidth * maxVector / figureData[opt.range[0]].v) / 4);
 		let rRange = (t + (opt.sectorWidth * maxVector / figureData[opt.range[1]].v) / 4);
 
-		if (!started && (t > startDeg - 1 && t < startDeg + 1)) {
+		if (!started && (t > START_DEG - 1 && t < START_DEG + 1)) {
 			started = true;
 		}
 
@@ -140,8 +140,8 @@ function Sector(options) {
 		started = false;
 		stoped = false;
 		sector
-			.attr('cx', getFigureCoords(startDeg).x)
-			.attr('cy', getFigureCoords(startDeg).y);
+			.attr('cx', getFigureCoords(START_DEG).x)
+			.attr('cy', getFigureCoords(START_DEG).y);
 	}
 
 	/**
@@ -189,9 +189,9 @@ function Range(options) {
 
 	let opt = Object.assign(defaults, options);
 
-	const startDeg = 270;
-	let rangeRadL = startDeg - opt.rangeAngle / 2;
-	let rangeRadR = startDeg + opt.rangeAngle / 2;
+	const START_DEG = 270;
+	let rangeRadL = START_DEG - opt.rangeAngle / 2;
+	let rangeRadR = START_DEG + opt.rangeAngle / 2;
 	let range = [rangeRadL, rangeRadR];
 
 	for (let i = 0; i < range.length; i++) {
@@ -353,7 +353,7 @@ function Game(options) {
 		]
 	};
 
-	let opt = Object.assign(true, defaults, options);
+	let opt = Object.assign(defaults, options);
 
 	let {rotatingArea, holder, progress, svg} = opt;
 	const startRoteteDeg = 0;
@@ -413,7 +413,7 @@ function Game(options) {
 	let startRotate = false;
 
 	// initial rotate area
-	rotatingArea.css('transform', 'rotate(' + currentRoteteDeg + 'deg)');
+	rotatingArea.css('transform', `rotate(${currentRoteteDeg}deg)`);
 
 	// rotate ellipse area
 	function rotateArea() {
@@ -426,7 +426,7 @@ function Game(options) {
 
 		let step = function() {
 			// rotate area
-			rotatingArea.css('transform', 'rotate(' + currentRoteteDeg + 'deg)');
+			rotatingArea.css('transform', `rotate(${currentRoteteDeg}deg)`);
 
 			let directionProgress = Date.now() - startDirectionTime;
 			let gameProgress = Date.now() - startGameTime;
@@ -446,7 +446,7 @@ function Game(options) {
 			if (directionProgress >= opt.levels[currLevel].speed / 360) {
 				d.notify(gameProgress, currentRoteteDeg);
 
-				if (Object.is(currentRoteteDeg % 360 , newRotateAngle)) {
+				if (Object.is(currentRoteteDeg % 360, newRotateAngle)) {
 					direction = getRandomInt(0, 1);
 					newRotateAngle = getRandomInt(
 						getDegRange(direction, currentRoteteDeg)[0],
@@ -597,11 +597,11 @@ function Game(options) {
 		rotatingArea.stop().animate({
 			opacity: 0
 		}, fromInit ? 0 : 1000, () => {
-			msg.setText('init', 'Round ' + (currLevel + 1)).show();
+			msg.setText('init', `Round  ${(currLevel + 1)}`).show();
 			sector.resetSectorState();
 			progressBar.resetProgress();
 
-			rotatingArea.css('transform', 'rotate(' + currentRoteteDeg + 'deg)');
+			rotatingArea.css('transform', `rotate(${currentRoteteDeg}deg)`);
 
 			rotatingArea.animate({
 				opacity: 1
