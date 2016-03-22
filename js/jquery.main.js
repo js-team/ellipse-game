@@ -10,19 +10,18 @@ function initGame() {
 		new Game({
 			svg: holder.find('svg'),
 			rotatingArea: holder.find('.svg-ellipse-area'),
-			parent: holder.find('.svg-area'),
+			holder: holder.find('.svg-area'),
 			minRotateAngle: 10,
-			startRotateDeg: 0,
-			rotateDegRange: 90,
-			speed: 40,
-			duration: 10000
+			rotateDegRange: 90
 		});
 	});
 }
 
 // ellipse constructor
 function Ellipse(options) {
-	var defaults = {
+	'use strict';
+
+	let defaults = {
 		svg: 'svg#ellipse',
 		radius: [], // [250, 175]
 		lineWidth: 10,
@@ -30,19 +29,19 @@ function Ellipse(options) {
 		clipId: ''
 	};
 
-	var opt = jQuery.extend({}, defaults, options);
+	let opt = Object.assign(defaults, options);
 
-	var GroupObj = (function() {
-		var svgElem = jQuery(opt.svg);
-		var svgDom = opt.svg.get(0);
-		var r1 = opt.radius[0] || (svgElem.width() - opt.lineWidth) / 2;
-		var r2 = opt.radius[1] || (svgElem.height() - opt.lineWidth) / 2;
-		var center = [(r1 + opt.lineWidth / 2), (r2 + opt.lineWidth / 2)];
+	let GroupObj = (function() {
+		let svgElem = jQuery(opt.svg);
+		let svgDom = opt.svg.get(0);
+		let r1 = opt.radius[0] || (svgElem.width() - opt.lineWidth) / 2;
+		let r2 = opt.radius[1] || (svgElem.height() - opt.lineWidth) / 2;
+		let center = [(r1 + opt.lineWidth / 2), (r2 + opt.lineWidth / 2)];
 
-		var group = d3.select(svgDom).append('g')
+		let group = d3.select(svgDom).append('g')
 			.attr('transform', 'translate(' + center[0] + ',' + center[1] + ')');
 
-		var ellipse = group.append('ellipse')
+		let ellipse = group.append('ellipse')
 			.attr('rx', r1)
 			.attr('ry', r2)
 			.attr('stroke', opt.color)
@@ -51,28 +50,24 @@ function Ellipse(options) {
 			.attr('clip-path', opt.clipId ? 'url(#' + opt.clipId + ')' : '');
 
 		return {
-			r1: r1,
-			r2: r2,
-			center: center,
-			g: group,
-			ellipse: ellipse
+			r1,
+			r2,
+			center,
+			group,
+			ellipse
 		};
 	}());
 
-	var ellipseData = [];
+	let ellipseData = [];
 
 	// get ellipse points
-	for (var fi = 0; fi <= 360; fi++) {
-		var angleRad = deg2rad(fi);
-		var vector = getVectorLength(angleRad, GroupObj.r1, GroupObj.r2);
-		var x = parseInt(vector * Math.cos(angleRad));
-		var y = parseInt(vector * Math.sin(angleRad));
+	for (let fi = 0; fi <= 360; fi++) {
+		let angleRad = deg2rad(fi);
+		let v = getVectorLength(angleRad, GroupObj.r1, GroupObj.r2);
+		let x = parseInt(v * Math.cos(angleRad));
+		let y = parseInt(v * Math.sin(angleRad));
 
-		ellipseData.push({
-			x: x,
-			y: y,
-			v: vector
-		});
+		ellipseData.push({x, y, v});
 	}
 
 	return {
@@ -83,7 +78,9 @@ function Ellipse(options) {
 
 // sector constructor
 function Sector(options) {
-	var defaults = {
+	'use strict';
+
+	let defaults = {
 		holder: null,
 		figureData: [],
 		center: [0, 0],
@@ -93,31 +90,31 @@ function Sector(options) {
 		clipId: ''
 	};
 
-	var opt = jQuery.extend({}, defaults, options);
+	let opt = Object.assign(defaults, options);
 
-	const START_DEG = 270;
-	var figureData = opt.figureData;
-	var maxVector = figureData[0].v;
-	var started = false;
-	var stoped = false;
+	const startDeg = 270;
+	let figureData = opt.figureData;
+	let maxVector = figureData[0].v;
+	let started = false;
+	let stoped = false;
 
-	var clipPathId = opt.clipId ? opt.clipId : 'clip' + Date.now();
+	let clipPathId = opt.clipId ? opt.clipId : 'clip' + Date.now();
 
-	var clipPath = opt.holder.append('clipPath')
+	let clipPath = opt.holder.append('clipPath')
 			.attr('id', clipPathId);
 
-	var sector = clipPath.append('circle')
-			.attr('cx', getFigureCoords(START_DEG).x)
-			.attr('cy', getFigureCoords(START_DEG).y)
+	let sector = clipPath.append('circle')
+			.attr('cx', getFigureCoords(startDeg).x)
+			.attr('cy', getFigureCoords(startDeg).y)
 			.attr('r', opt.sectorWidth);
 
 	// move sector handler
 	function moveSector(t) {
-		var centerCoords = getFigureCoords(t);
-		var lRange = (t - (opt.sectorWidth * maxVector / figureData[opt.range[0]].v) / 4);
-		var rRange = (t + (opt.sectorWidth * maxVector / figureData[opt.range[1]].v) / 4);
+		let centerCoords = getFigureCoords(t);
+		let lRange = (t - (opt.sectorWidth * maxVector / figureData[opt.range[0]].v) / 4);
+		let rRange = (t + (opt.sectorWidth * maxVector / figureData[opt.range[1]].v) / 4);
 
-		if (!started && (t > START_DEG - 1 && t < START_DEG + 1)) {
+		if (!started && (t > startDeg - 1 && t < startDeg + 1)) {
 			started = true;
 		}
 
@@ -143,8 +140,8 @@ function Sector(options) {
 		started = false;
 		stoped = false;
 		sector
-			.attr('cx', getFigureCoords(START_DEG).x)
-			.attr('cy', getFigureCoords(START_DEG).y);
+			.attr('cx', getFigureCoords(startDeg).x)
+			.attr('cy', getFigureCoords(startDeg).y);
 	}
 
 	/**
@@ -162,16 +159,16 @@ function Sector(options) {
 
 	return {
 		clipId: clipPathId,
-		resetSectorState: function() {
+		resetSectorState () {
 			resetSector();
 		},
-		moveSector: function(t) {
+		moveSector (t) {
 			moveSector(t);
 		},
-		started: function() {
+		started (){
 			return started;
 		},
-		stoped: function() {
+		stoped (){
 			return stoped;
 		}
 	};
@@ -179,23 +176,25 @@ function Sector(options) {
 
 // range lines constructor
 function Range(options) {
-	var defaults = {
+	'use strict';
+
+	let defaults = {
 		holder: null, // DOM g element
 		coordinates: [],
-		lineWidth: 10,
+		lineWidth: 5,
 		lineHeight: 10,
 		rangeAngle: 50,
 		color: '#000'
 	};
 
-	var opt = jQuery.extend({}, defaults, options);
+	let opt = Object.assign(defaults, options);
 
-	const START_DEG = 270;
-	var rangeRadL = START_DEG - opt.rangeAngle / 2;
-	var rangeRadR = START_DEG + opt.rangeAngle / 2;
-	var range = [rangeRadL, rangeRadR];
+	const startDeg = 270;
+	let rangeRadL = startDeg - opt.rangeAngle / 2;
+	let rangeRadR = startDeg + opt.rangeAngle / 2;
+	let range = [rangeRadL, rangeRadR];
 
-	for (var i = 0; i < range.length; i++) {
+	for (let i = 0; i < range.length; i++) {
 		opt.holder.append('line')
 			.attr('class', 'line')
 			.attr('x1', opt.coordinates[range[i]].x)
@@ -211,8 +210,10 @@ function Range(options) {
 }
 
 // message constructor
-function StateMessage(options, state) {
-	var defaults = {
+function StateMessage(options) {
+	'use strict';
+
+	let defaults = {
 		elem: jQuery('<div class="msg"></div>'),
 		parent: jQuery('body'),
 		defaultText: 'Move here to start !',
@@ -221,8 +222,8 @@ function StateMessage(options, state) {
 		successText: 'Winner :)'
 	};
 
-	var opt = jQuery.extend({}, defaults, options);
-	var elem = opt.elem;
+	let opt = Object.assign(defaults, options);
+	let elem = opt.elem;
 
 	elem.appendTo(opt.parent);
 
@@ -253,13 +254,13 @@ function StateMessage(options, state) {
 	}
 
 	return {
-		show: function() {
+		show () {
 			showMsg();
 		},
-		hide: function() {
+		hide () {
 			hideMsg();
 		},
-		setText: function(state, msg) {
+		setText (state, msg) {
 			setText(state, msg);
 			return this;
 		}
@@ -268,21 +269,23 @@ function StateMessage(options, state) {
 
 // progress bar constructor
 function ProgressBar(options) {
-	var defaults = {
+	'use strict';
+
+	let defaults = {
 		elem: jQuery('<canvas class="progress-bar" width="300" height="20"></canvas>'),
 		parent: jQuery('body'),
 		gradient: ['#00e741', '#f00']
 	};
 
-	var opt = jQuery.extend({}, defaults, options);
-	var elem = opt.elem;
+	let opt = Object.assign(defaults, options);
+	let elem = opt.elem;
 
 	// find elements
 	elem.appendTo(opt.parent);
 
-	var ctx = elem.get(0).getContext('2d');
-	var gradient = ctx.createLinearGradient(0, 0, elem.width(), 0);
-	var progressWidth = 0;
+	let ctx = elem.get(0).getContext('2d');
+	let gradient = ctx.createLinearGradient(0, 0, elem.width(), 0);
+	let progressWidth = 0;
 
 	// create gradient
 	gradient.addColorStop(0, opt.gradient[0]);
@@ -301,10 +304,10 @@ function ProgressBar(options) {
 	}
 
 	return {
-		resetProgress: function() {
+		resetProgress () {
 			ctx.clearRect(1, 1, elem.width() - 2, elem.height() - 2);
 		},
-		animProgress: function(value) {
+		animProgress (value) {
 			redrawProgress(value);
 		}
 	};
@@ -312,13 +315,14 @@ function ProgressBar(options) {
 
 // game constructor
 function Game(options) {
-	var defaults = {
+	'use strict';
+
+	let defaults = {
 		svg: jQuery('.svg-ellipse'),
 		rotatingArea: jQuery('.svg-ellipse-area'),
-		parent: jQuery('.svg-area'),
+		holder: jQuery('.svg-area'),
 		progress: jQuery('.progress-holder'),
 		minRotateAngle: 10,
-		startRotateDeg: 0,
 		rotateDegRange: 20,
 		ellipse: {
 			lineWidth: 8
@@ -328,10 +332,10 @@ function Game(options) {
 			color: '#f00'
 		},
 		sector: {
-			sectorWidth: 30
+			width: 30
 		},
 		range: {
-			rangeAngle: 80
+			angle: 80
 		},
 		levels: [
 			{
@@ -349,28 +353,26 @@ function Game(options) {
 		]
 	};
 
-	var opt = jQuery.extend(true, defaults, options);
+	let opt = Object.assign(true, defaults, options);
 
-	var timer = null;
-	var canMove = true;
-	var rotatingArea = opt.rotatingArea;
-	var holder = opt.parent;
-	var progress = opt.progress;
-	var svg = opt.svg;
-	var currentRoteteDeg = opt.startRotateDeg;
-	var prevPageX = 0;
-	var prevPageY = 0;
-	var clipId = 'circle' + Date.now();
-	var currLevel = holder.data('level') - 1 || 0;
+	let {rotatingArea, holder, progress, svg} = opt;
+	const startRoteteDeg = 0;
+	let timer = null;
+	let canMove = true;
+	let currentRoteteDeg = startRoteteDeg;
+	let prevPageX = 0;
+	let prevPageY = 0;
+	let clipId = 'circle' + Date.now();
+	let currLevel = holder.data('level') - 1 || 0;
 
 	// create base ellipse
-	var ellipse = Ellipse({
+	let ellipse = Ellipse({
 		svg: svg,
 		lineWidth: opt.ellipse.lineWidth
 	});
 
 	// create sector ellipse
-	var sectorEllipse = Ellipse({
+	let sectorEllipse = Ellipse({
 		svg: svg,
 		lineWidth: opt.sectorEllipse.lineWidth,
 		color: opt.sectorEllipse.color,
@@ -378,37 +380,37 @@ function Game(options) {
 	});
 
 	// create range
-	var range = Range({
-		holder: ellipse.obj.g,
+	let range = Range({
+		holder: ellipse.obj.group,
 		coordinates: ellipse.data,
-		rangeAngle: opt.range.rangeAngle
+		rangeAngle: opt.range.angle
 	});
 
 	// create sector
-	var sector = Sector({
-		holder: sectorEllipse.obj.g,
+	let sector = Sector({
+		holder: sectorEllipse.obj.group,
 		figureData: ellipse.data,
 		clipId: clipId,
 		range: range,
-		sectorWidth: opt.sector.sectorWidth
+		sectorWidth: opt.sector.width
 	});
 
 	// create status message
-	var msg = StateMessage({
+	let msg = StateMessage({
 		parent: holder
 	});
 
 	// create progress
-	var progressBar = ProgressBar({
+	let progressBar = ProgressBar({
 		parent: progress
 	});
 
-	var direction = getRandomInt(0, 1);
-	var newRotateAngle = getRandomInt(
+	let direction = getRandomInt(0, 1);
+	let newRotateAngle = getRandomInt(
 		getDegRange(direction, currentRoteteDeg)[0],
 		getDegRange(direction, currentRoteteDeg)[1]
 	);
-	var startRotate = false;
+	let startRotate = false;
 
 	// initial rotate area
 	rotatingArea.css('transform', 'rotate(' + currentRoteteDeg + 'deg)');
@@ -417,17 +419,17 @@ function Game(options) {
 	function rotateArea() {
 		startRotate = true;
 
-		var d = jQuery.Deferred();
+		let d = jQuery.Deferred();
 
-		var startDirectionTime = Date.now();
-		var startGameTime = Date.now();
+		let startDirectionTime = Date.now();
+		let startGameTime = Date.now();
 
-		var step = function() {
+		let step = function() {
 			// rotate area
 			rotatingArea.css('transform', 'rotate(' + currentRoteteDeg + 'deg)');
 
-			var directionProgress = Date.now() - startDirectionTime;
-			var gameProgress = Date.now() - startGameTime;
+			let directionProgress = Date.now() - startDirectionTime;
+			let gameProgress = Date.now() - startGameTime;
 
 			d.notify(gameProgress);
 
@@ -444,7 +446,7 @@ function Game(options) {
 			if (directionProgress >= opt.levels[currLevel].speed / 360) {
 				d.notify(gameProgress, currentRoteteDeg);
 
-				if (currentRoteteDeg % 360 === newRotateAngle) {
+				if (Object.is(currentRoteteDeg % 360 , newRotateAngle)) {
 					direction = getRandomInt(0, 1);
 					newRotateAngle = getRandomInt(
 						getDegRange(direction, currentRoteteDeg)[0],
@@ -469,24 +471,24 @@ function Game(options) {
 		return d;
 	}
 
-	function getDegRange(direction, currentRoteteDeg) {
-		var from = direction > 0 ? currentRoteteDeg + opt.minRotateAngle : currentRoteteDeg - opt.rotateDegRange;
-		var to = direction > 0 ? currentRoteteDeg + opt.rotateDegRange : currentRoteteDeg - opt.minRotateAngle;
+	function getDegRange(direction, currentRoteteDeg = startRoteteDeg) {
+		let from = direction > 0 ? currentRoteteDeg + opt.minRotateAngle : currentRoteteDeg - opt.rotateDegRange;
+		let to = direction > 0 ? currentRoteteDeg + opt.rotateDegRange : currentRoteteDeg - opt.minRotateAngle;
 
 		return [from, to];
 	}
 
 	// get rotate angle on mouse move
 	function getRotateAngle(e) {
-		var pageX = e && e.pageX || prevPageX;
-		var pageY = e && e.pageY || prevPageY;
+		let pageX = e && e.pageX || prevPageX;
+		let pageY = e && e.pageY || prevPageY;
 
-		var cX = holder.offset().left + holder.width() / 2;
-		var cY = holder.offset().top + holder.width() / 2;
-		var x = cX - pageX;
-		var y = cY - pageY;
-		var sinT = 0;
-		var tS = 0;
+		let cX = holder.offset().left + holder.width() / 2;
+		let cY = holder.offset().top + holder.width() / 2;
+		let x = cX - pageX;
+		let y = cY - pageY;
+		let sinT = 0;
+		let tS = 0;
 
 		// dont change this part!!
 		if (cY > pageY) {
@@ -508,7 +510,7 @@ function Game(options) {
 		}
 
 		// angle in radians
-		var rotRad = 2 * Math.PI - (tS + Math.asin(sinT)) - deg2rad(currentRoteteDeg % 360);
+		let rotRad = 2 * Math.PI - (tS + Math.asin(sinT)) - deg2rad(currentRoteteDeg % 360);
 
 		// calc correct angle in radians
 		rotRad = rotRad < 0 ? 2 * Math.PI + rotRad : rotRad > 2 * Math.PI ? rotRad - 2 * Math.PI : rotRad;
@@ -523,7 +525,7 @@ function Game(options) {
 	function moveHandler(e) {
 		if (!canMove) return;
 
-		var t = getRotateAngle(e);
+		let t = getRotateAngle(e);
 
 		sector.moveSector(t);
 
@@ -585,7 +587,7 @@ function Game(options) {
 	// reset level
 	function resetLevel(fromInit) {
 		startRotate = false;
-		currentRoteteDeg = opt.startRotateDeg;
+		currentRoteteDeg = startRoteteDeg;
 		direction = getRandomInt(0, 1);
 		newRotateAngle = getRandomInt(
 			getDegRange(direction, currentRoteteDeg)[0],
@@ -594,7 +596,7 @@ function Game(options) {
 
 		rotatingArea.stop().animate({
 			opacity: 0
-		}, fromInit ? 0 : 1000, function() {
+		}, fromInit ? 0 : 1000, () => {
 			msg.setText('init', 'Round ' + (currLevel + 1)).show();
 			sector.resetSectorState();
 			progressBar.resetProgress();
@@ -603,7 +605,7 @@ function Game(options) {
 
 			rotatingArea.animate({
 				opacity: 1
-			}, 1000, function() {
+			}, 1000, () => {
 				msg.setText('init');
 				jQuery(document).on('mouseenter mousemove', moveHandler);
 			});
@@ -611,6 +613,7 @@ function Game(options) {
 
 	}
 
+	// end level
 	function endLevels() {
 		msg.setText('init', 'Game is over !! :))))').show();
 
@@ -619,6 +622,7 @@ function Game(options) {
 		}, 1000);
 	}
 
+	// initial state
 	resetLevel(true);
 }
 
