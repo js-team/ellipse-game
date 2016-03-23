@@ -162,13 +162,13 @@ function Sector(options) {
 		resetSectorState () {
 			resetSector();
 		},
-		moveSector (t) {
+		set sectorAngle (t) {
 			moveSector(t);
 		},
-		started (){
+		get started (){
 			return started;
 		},
-		stoped (){
+		get stoped (){
 			return stoped;
 		}
 	};
@@ -438,7 +438,7 @@ function Game(options) {
 				return;
 			}
 
-			if (sector.stoped()) {
+			if (sector.stoped) {
 				d.reject('error');
 				return;
 			}
@@ -527,9 +527,9 @@ function Game(options) {
 
 		let t = getRotateAngle(e);
 
-		sector.moveSector(t);
+		sector.sectorAngle = t;
 
-		if (!startRotate && sector.started()) {
+		if (!startRotate && sector.started) {
 			rotateArea()
 				.done(onSuccess)
 				.fail(onError)
