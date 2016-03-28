@@ -1,0 +1,12 @@
+@import 'icons.scss';
+
+$red : #f00;
+
+body {
+	background-color: $red;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	transition: all 1s ease;
+	display: flex;
+}
