@@ -1,6 +1,6 @@
 'use strict';
 
-export  default function StateMessage(options) {
+export default function StateMessage(options) {
 	let defaults = {
 		elem: jQuery('<div class="msg"></div>'),
 		parent: jQuery('body'),

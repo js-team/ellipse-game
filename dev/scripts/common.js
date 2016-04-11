@@ -2,9 +2,7 @@
 
 export let mathLib = {
 	// Converts from degrees to radians.
-	deg2rad: function(degrees) {
-		return degrees * Math.PI / 180;
-	},
+	deg2rad: (deg) => deg * Math.PI / 180,
 
 	// Converts from radians to degrees.
 	rad2deg: function(radians) {
@@ -23,12 +21,11 @@ export let mathLib = {
 	* @param {number} b - The small ellipse radius.
 	* @return {number} ro - The ro value (vector length , in pixels).
 	*/
-	getVectorLength: function(fi, a, b) {
+	getVectorLength(fi, a, b) {
 		var cos2fi = (1 + Math.cos(2 * fi)) / 2;
 		var sin2fi = (1 - Math.cos(2 * fi)) / 2;
-		var ro = a * b / Math.sqrt(Math.pow(b, 2) * cos2fi + Math.pow(a, 2) * sin2fi);
 
-		return ro;
+		return a * b / Math.sqrt(Math.pow(b, 2) * cos2fi + Math.pow(a, 2) * sin2fi);
 	},
 
 	/**
@@ -51,9 +48,5 @@ export let mathLib = {
 	* @return {number} b - The side b of right triangle, in pixels
 	* @return {number} sinT - The sine of the angle from ellipse center.
 	*/
-	getSin: function(a, b) {
-		var sinT = Math.abs(b) / Math.sqrt((Math.pow(a, 2) + Math.pow(b, 2)));
-
-		return sinT;
-	}
+	getSin: (a, b) => Math.abs(b) / Math.sqrt((Math.pow(a, 2) + Math.pow(b, 2)))
 }

@@ -49,10 +49,10 @@ export default function Game(options) {
 	let opt = Object.assign(defaults, options);
 
 	let {rotatingArea, holder, progress, svg} = opt;
-	const startRoteteDeg = 0;
+	const startRotateDeg = 0;
 	let timer = null;
 	let canMove = true;
-	let currentRoteteDeg = startRoteteDeg;
+	let currentRotateDeg = startRotateDeg;
 	let prevPageX = 0;
 	let prevPageY = 0;
 	let clipId = 'circle' + Date.now();
@@ -100,13 +100,13 @@ export default function Game(options) {
 
 	let direction = MathLib.getRandomInt(0, 1);
 	let newRotateAngle = MathLib.getRandomInt(
-		getDegRange(direction, currentRoteteDeg)[0],
-		getDegRange(direction, currentRoteteDeg)[1]
+		getDegRange(direction, currentRotateDeg)[0],
+		getDegRange(direction, currentRotateDeg)[1]
 	);
 	let startRotate = false;
 
 	// initial rotate area
-	rotatingArea.css('transform', `rotate(${currentRoteteDeg}deg)`);
+	rotatingArea.css('transform', `rotate(${currentRotateDeg}deg)`);
 
 	// rotate ellipse area
 	function rotateArea() {
@@ -119,7 +119,7 @@ export default function Game(options) {
 
 		let step = function() {
 			// rotate area
-			rotatingArea.css('transform', `rotate(${currentRoteteDeg}deg)`);
+			rotatingArea.css('transform', `rotate(${currentRotateDeg}deg)`);
 
 			let directionProgress = Date.now() - startDirectionTime;
 			let gameProgress = Date.now() - startGameTime;
@@ -137,20 +137,20 @@ export default function Game(options) {
 			}
 
 			if (directionProgress >= opt.levels[currLevel].speed / 360) {
-				d.notify(gameProgress, currentRoteteDeg);
+				d.notify(gameProgress, currentRotateDeg);
 
-				if (Object.is(currentRoteteDeg % 360, newRotateAngle)) {
+				if (Object.is(currentRotateDeg % 360, newRotateAngle)) {
 					direction = MathLib.getRandomInt(0, 1);
 					newRotateAngle = MathLib.getRandomInt(
-						getDegRange(direction, currentRoteteDeg)[0],
-						getDegRange(direction, currentRoteteDeg)[1]
+						getDegRange(direction, currentRotateDeg)[0],
+						getDegRange(direction, currentRotateDeg)[1]
 					);
 				}
 
 				if (direction > 0) {
-					currentRoteteDeg++;
+					currentRotateDeg++;
 				} else {
-					currentRoteteDeg--;
+					currentRotateDeg--;
 				}
 
 				startDirectionTime = Date.now();
@@ -164,9 +164,9 @@ export default function Game(options) {
 		return d;
 	}
 
-	function getDegRange(direction, currentRoteteDeg = startRoteteDeg) {
-		let from = direction > 0 ? currentRoteteDeg + opt.minRotateAngle : currentRoteteDeg - opt.rotateDegRange;
-		let to = direction > 0 ? currentRoteteDeg + opt.rotateDegRange : currentRoteteDeg - opt.minRotateAngle;
+	function getDegRange(direction, currentRotateDeg = startRotateDeg) {
+		let from = direction > 0 ? currentRotateDeg + opt.minRotateAngle : currentRotateDeg - opt.rotateDegRange;
+		let to = direction > 0 ? currentRotateDeg + opt.rotateDegRange : currentRotateDeg - opt.minRotateAngle;
 
 		return [from, to];
 	}
@@ -203,7 +203,7 @@ export default function Game(options) {
 		}
 
 		// angle in radians
-		let rotRad = 2 * Math.PI - (tS + Math.asin(sinT)) - MathLib.deg2rad(currentRoteteDeg % 360);
+		let rotRad = 2 * Math.PI - (tS + Math.asin(sinT)) - MathLib.deg2rad(currentRotateDeg % 360);
 
 		// calc correct angle in radians
 		rotRad = rotRad < 0 ? 2 * Math.PI + rotRad : rotRad > 2 * Math.PI ? rotRad - 2 * Math.PI : rotRad;
@@ -267,7 +267,7 @@ export default function Game(options) {
 	}
 
 	// game progress
-	function onProgress(progress, currentRoteteDeg) {
+	function onProgress(progress, currentRotateDeg) {
 		msg.setText().show();
 
 		// animate progress
@@ -280,11 +280,11 @@ export default function Game(options) {
 	// reset level
 	function resetLevel(fromInit) {
 		startRotate = false;
-		currentRoteteDeg = startRoteteDeg;
+		currentRotateDeg = startRotateDeg;
 		direction = MathLib.getRandomInt(0, 1);
 		newRotateAngle = MathLib.getRandomInt(
-			getDegRange(direction, currentRoteteDeg)[0],
-			getDegRange(direction, currentRoteteDeg)[1]
+			getDegRange(direction, currentRotateDeg)[0],
+			getDegRange(direction, currentRotateDeg)[1]
 		);
 
 		rotatingArea.stop().animate({
@@ -294,7 +294,7 @@ export default function Game(options) {
 			sector.resetSectorState();
 			progressBar.resetProgress();
 
-			rotatingArea.css('transform', `rotate(${currentRoteteDeg}deg)`);
+			rotatingArea.css('transform', `rotate(${currentRotateDeg}deg)`);
 
 			rotatingArea.animate({
 				opacity: 1
